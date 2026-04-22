@@ -8,21 +8,36 @@ require("dotenv").config();
 
 const app = express();
 
+// ================= MIDDLEWARE =================
 app.use(express.json());
+
 app.use(cors({
-  origin: "*"   // allow all (safe for now)
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("DB Connected"))
-  .catch(err => console.log(err));
+// ================= ROOT ROUTE =================
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
 
+// ================= DATABASE =================
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("DB Connected"))
+.catch(err => console.log("DB Error:", err));
+
+// ================= ROUTES =================
 app.use("/api", require("./routes/authRoutes"));
 
+// ================= ERROR HANDLER =================
 const errorHandler = require("./middleware/errorHandler");
 app.use(errorHandler);
 
-// ✅ FIXED PORT
+// ================= SERVER =================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
