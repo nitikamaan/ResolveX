@@ -22,11 +22,6 @@ app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
-// ================= DATABASE =================
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log("DB Error:", err));
-
 // ================= ROUTES =================
 app.use("/api", require("./routes/authRoutes"));
 
@@ -34,9 +29,17 @@ app.use("/api", require("./routes/authRoutes"));
 const errorHandler = require("./middleware/errorHandler");
 app.use(errorHandler);
 
-// ================= SERVER =================
+// ================= SERVER START AFTER DB =================
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB Connected");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.log("DB Connection Failed ❌", err);
+  });

@@ -1,36 +1,13 @@
-body {
+/* Reset */
+* {
   margin: 0;
-  font-family: Arial;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.container {
-  width: 350px;
-  margin: 80px auto;
-  background: white;
-  padding: 25px;
-  border-radius: 10px;
-}
-
-h2 {
-  text-align: center;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background: #667eea;
-  color: white;
-  border: none;
-}
-
-.error {
-  color: red;
-  text-align: center;
+/* Body */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+  min-height: 100vh;
 }

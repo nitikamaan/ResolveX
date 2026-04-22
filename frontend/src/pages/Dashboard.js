@@ -6,38 +6,69 @@ export default function Dashboard() {
 
   const [user, setUser] = useState({});
   const [course, setCourse] = useState("");
-  const [pass, setPass] = useState({});
+  const [pass, setPass] = useState({
+    oldPassword: "",
+    newPassword: ""
+  });
   const [error, setError] = useState("");
 
+  // ================= LOAD USER =================
   useEffect(() => {
-    API.get("/me", { headers: { Authorization: token } })
-      .then(res => setUser(res.data))
+    API.get("/me", {
+      headers: { Authorization: `Bearer ${token}` } // ✅ FIXED
+    })
+      .then(res => {
+        setUser(res.data);
+        setCourse(res.data.course || "");
+      })
       .catch(() => {
         localStorage.removeItem("token");
         window.location.href = "/login";
       });
   }, []);
 
+  // ================= UPDATE COURSE =================
   const updateCourse = async () => {
     try {
-      await API.put("/update-course", { course }, {
-        headers: { Authorization: token }
-      });
+      await API.put(
+        `/user/${user._id}`, // ✅ FIXED ROUTE
+        { course },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
       alert("Course Updated");
-    } catch {
-      setError("Error updating course");
+      setError("");
+    } catch (err) {
+      console.log(err);
+      setError(err.response?.data?.message || "Error updating course");
     }
   };
 
+  // ================= UPDATE PASSWORD =================
   const updatePassword = async () => {
     try {
-      await API.put("/update-password", pass, {
-        headers: { Authorization: token }
-      });
+      await API.put(
+        `/user/${user._id}`, // ✅ using same route
+        { password: pass.newPassword },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
       alert("Password Updated");
+      setError("");
     } catch (err) {
-      setError(err.response?.data);
+      console.log(err);
+      setError(err.response?.data?.message || "Error updating password");
     }
+  };
+
+  // ================= LOGOUT =================
+  const logout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
   };
 
   return (
@@ -50,21 +81,28 @@ export default function Dashboard() {
 
       {error && <p className="error">{error}</p>}
 
-      <input placeholder="New Course" onChange={e=>setCourse(e.target.value)}/>
+      {/* UPDATE COURSE */}
+      <h4>Update Course</h4>
+      <input
+        placeholder="New Course"
+        value={course}
+        onChange={(e) => setCourse(e.target.value)}
+      />
       <button onClick={updateCourse}>Update Course</button>
 
-      <input type="password" placeholder="Old Password"
-        onChange={e=>setPass({...pass,oldPassword:e.target.value})}/>
-      <input type="password" placeholder="New Password"
-        onChange={e=>setPass({...pass,newPassword:e.target.value})}/>
+      {/* UPDATE PASSWORD */}
+      <h4>Update Password</h4>
+      <input
+        type="password"
+        placeholder="New Password"
+        onChange={(e) =>
+          setPass({ ...pass, newPassword: e.target.value })
+        }
+      />
       <button onClick={updatePassword}>Update Password</button>
 
-      <button onClick={()=>{
-        localStorage.removeItem("token");
-        window.location.href="/login";
-      }}>
-        Logout
-      </button>
+      {/* LOGOUT */}
+      <button onClick={logout}>Logout</button>
     </div>
   );
 }

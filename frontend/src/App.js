@@ -5,14 +5,24 @@ import Dashboard from "./pages/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
 
 const PrivateRoute = ({ children }) => {
-  return localStorage.getItem("token") ? children : <Navigate to="/login" />;
+  const token = localStorage.getItem("token");
+
+  if (!token || token === "undefined" || token === "null") {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
 };
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Register />} />
+
+        {/* Redirect root */}
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
         <Route
@@ -25,6 +35,7 @@ function App() {
         />
 
         <Route path="*" element={<ErrorPage />} />
+
       </Routes>
     </BrowserRouter>
   );
