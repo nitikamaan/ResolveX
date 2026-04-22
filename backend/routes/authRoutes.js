@@ -6,35 +6,38 @@ const auth = require("../middleware/auth");
 
 const router = express.Router();
 
-// Register
+
+// ================= REGISTER =================
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, course } = req.body;
 
     let user = await Student.findOne({ email });
-    if (user) return res.status(400).json("Email already registered");
+    if (user) return res.status(400).json({ message: "Email already registered" });
 
     const hashed = await bcrypt.hash(password, 10);
 
     user = new Student({ name, email, password: hashed, course });
     await user.save();
 
-    res.json("Registered successfully");
+    res.json({ message: "Registered successfully" });
+
   } catch (err) {
-    res.status(500).json(err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Login
+
+// ================= LOGIN =================
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     const user = await Student.findOne({ email });
-    if (!user) return res.status(400).json("Invalid email or password");
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json("Invalid email or password");
+    if (!match) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
       { id: user._id },
@@ -43,22 +46,43 @@ router.post("/login", async (req, res) => {
     );
 
     res.json({ token });
+
   } catch (err) {
-    res.status(500).json(err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Get Logged-in User
+
+// ================= GET LOGGED IN USER =================
 router.get("/me", auth, async (req, res) => {
   try {
     const user = await Student.findById(req.user).select("-password");
     res.json(user);
-  } catch {
-    res.status(500).json("Server error");
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// Update Password
+
+// ================= UPDATE COURSE =================
+router.put("/update-course", auth, async (req, res) => {
+  try {
+    const { course } = req.body;
+
+    const user = await Student.findById(req.user);
+    user.course = course;
+
+    await user.save();
+
+    res.json({ message: "Course updated" });
+
+  } catch (err) {
+    res.status(500).json({ message: "Error updating course" });
+  }
+});
+
+
+// ================= UPDATE PASSWORD =================
 router.put("/update-password", auth, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
@@ -66,29 +90,15 @@ router.put("/update-password", auth, async (req, res) => {
     const user = await Student.findById(req.user);
 
     const match = await bcrypt.compare(oldPassword, user.password);
-    if (!match) return res.status(400).json("Wrong old password");
+    if (!match) return res.status(400).json({ message: "Wrong old password" });
 
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
 
-    res.json("Password updated");
-  } catch {
-    res.status(500).json("Error updating password");
-  }
-});
+    res.json({ message: "Password updated" });
 
-// Update Course
-router.put("/update-course", auth, async (req, res) => {
-  try {
-    const { course } = req.body;
-
-    const user = await Student.findById(req.user);
-    user.course = course;
-    await user.save();
-
-    res.json("Course updated");
-  } catch {
-    res.status(500).json("Error updating course");
+  } catch (err) {
+    res.status(500).json({ message: "Error updating password" });
   }
 });
 
