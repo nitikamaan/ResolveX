@@ -12,10 +12,9 @@ export default function Dashboard() {
   });
   const [error, setError] = useState("");
 
-  // ================= LOAD USER =================
   useEffect(() => {
     API.get("/me", {
-      headers: { Authorization: `Bearer ${token}` } // ✅ FIXED
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
         setUser(res.data);
@@ -27,11 +26,10 @@ export default function Dashboard() {
       });
   }, []);
 
-  // ================= UPDATE COURSE =================
   const updateCourse = async () => {
     try {
       await API.put(
-        `/user/${user._id}`, // ✅ FIXED ROUTE
+        `/user/${user._id}`,
         { course },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -41,16 +39,14 @@ export default function Dashboard() {
       alert("Course Updated");
       setError("");
     } catch (err) {
-      console.log(err);
       setError(err.response?.data?.message || "Error updating course");
     }
   };
 
-  // ================= UPDATE PASSWORD =================
   const updatePassword = async () => {
     try {
       await API.put(
-        `/user/${user._id}`, // ✅ using same route
+        `/user/${user._id}`,
         { password: pass.newPassword },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -60,12 +56,10 @@ export default function Dashboard() {
       alert("Password Updated");
       setError("");
     } catch (err) {
-      console.log(err);
       setError(err.response?.data?.message || "Error updating password");
     }
   };
 
-  // ================= LOGOUT =================
   const logout = () => {
     localStorage.removeItem("token");
     window.location.href = "/login";
@@ -81,16 +75,13 @@ export default function Dashboard() {
 
       {error && <p className="error">{error}</p>}
 
-      {/* UPDATE COURSE */}
       <h4>Update Course</h4>
       <input
-        placeholder="New Course"
         value={course}
         onChange={(e) => setCourse(e.target.value)}
       />
       <button onClick={updateCourse}>Update Course</button>
 
-      {/* UPDATE PASSWORD */}
       <h4>Update Password</h4>
       <input
         type="password"
@@ -101,7 +92,6 @@ export default function Dashboard() {
       />
       <button onClick={updatePassword}>Update Password</button>
 
-      {/* LOGOUT */}
       <button onClick={logout}>Logout</button>
     </div>
   );

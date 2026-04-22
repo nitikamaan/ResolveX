@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 export default function Login() {
+  const navigate = useNavigate();
+
   const [data, setData] = useState({
     email: "",
     password: ""
@@ -10,7 +13,7 @@ export default function Login() {
   const [error, setError] = useState("");
 
   const submit = async () => {
-    console.log("LOGIN CLICKED", data); // 🔥 debug
+    console.log("LOGIN CLICKED", data);
 
     try {
       if (!data.email || !data.password) {
@@ -25,11 +28,11 @@ export default function Login() {
 
       alert("Login successful!");
 
-      // Redirect
-      window.location.href = "/dashboard";
+      // ✅ React navigation (IMPORTANT FIX)
+      navigate("/dashboard");
 
     } catch (err) {
-      console.log("LOGIN ERROR:", err); // 🔥 debug
+      console.log("LOGIN ERROR:", err);
       setError(err.response?.data?.message || "Login failed");
     }
   };
@@ -40,7 +43,6 @@ export default function Login() {
 
       {error && <p className="error">{error}</p>}
 
-      {/* ✅ FORM FIX */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -64,11 +66,7 @@ export default function Login() {
           }
         />
 
-        {/* ✅ BUTTON FIX */}
-        <button
-          type="submit"
-          style={{ position: "relative", zIndex: 1000 }}
-        >
+        <button type="submit">
           Login
         </button>
       </form>

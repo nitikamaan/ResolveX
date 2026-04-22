@@ -7,11 +7,7 @@ import ErrorPage from "./pages/ErrorPage";
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
 
-  if (!token || token === "undefined" || token === "null") {
-    return <Navigate to="/login" />;
-  }
-
-  return children;
+  return token ? children : <Navigate to="/login" />;
 };
 
 function App() {
@@ -19,12 +15,13 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Redirect root */}
+        {/* Default route */}
         <Route path="/" element={<Navigate to="/login" />} />
 
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
 
+        {/* Protected Route */}
         <Route
           path="/dashboard"
           element={
@@ -34,6 +31,7 @@ function App() {
           }
         />
 
+        {/* 404 page */}
         <Route path="*" element={<ErrorPage />} />
 
       </Routes>

@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 export default function Register() {
+  const navigate = useNavigate();
+
   const [data, setData] = useState({
     name: "",
     email: "",
@@ -12,7 +15,7 @@ export default function Register() {
   const [error, setError] = useState("");
 
   const submit = async () => {
-    console.log("SUBMIT RUNNING", data); // 🔥 debug
+    console.log("SUBMIT RUNNING", data);
 
     try {
       if (!data.name || !data.email || !data.password) {
@@ -20,12 +23,13 @@ export default function Register() {
         return;
       }
 
-      const res = await API.post("/register", data);
+      await API.post("/register", data);
 
       alert("Registered Successfully!");
+
       setError("");
 
-      // Clear form
+      // clear form
       setData({
         name: "",
         email: "",
@@ -33,8 +37,11 @@ export default function Register() {
         course: ""
       });
 
+      // ✅ important UX improvement
+      navigate("/login");
+
     } catch (err) {
-      console.log("ERROR:", err); // 🔥 debug
+      console.log("ERROR:", err);
       setError(err.response?.data?.message || "Something went wrong");
     }
   };
@@ -45,7 +52,6 @@ export default function Register() {
 
       {error && <p className="error">{error}</p>}
 
-      {/* ✅ FORM FIX */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -85,11 +91,7 @@ export default function Register() {
           }
         />
 
-        {/* ✅ BUTTON FIX */}
-        <button
-          type="submit"
-          style={{ position: "relative", zIndex: 1000 }}
-        >
+        <button type="submit">
           Register
         </button>
       </form>
