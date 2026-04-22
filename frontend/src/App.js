@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Register from "./pages/Register";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ErrorPage from "./pages/ErrorPage";
+import Home from "./pages/Home";
 
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
-
-  return token ? children : <Navigate to="/login" />;
+  return token ? children : <Navigate to="/" />;
 };
 
 function App() {
@@ -15,13 +15,13 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Default route */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        {/* 🔥 HOME PAGE */}
+        <Route path="/" element={<Home />} />
 
-        <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        {/* Protected Route */}
+        {/* 🔒 PROTECTED DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -31,7 +31,6 @@ function App() {
           }
         />
 
-        {/* 404 page */}
         <Route path="*" element={<ErrorPage />} />
 
       </Routes>
