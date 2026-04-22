@@ -1,5 +1,5 @@
-const dns = require('dns').promises;   // or just require('dns') in older Node
-dns.setServers(['8.8.8.8', '1.1.1.1']);   // to fix DNS refused block error
+const dns = require('dns').promises;
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -9,7 +9,9 @@ require("dotenv").config();
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "*"   // allow all (safe for now)
+}));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("DB Connected"))
@@ -20,4 +22,7 @@ app.use("/api", require("./routes/authRoutes"));
 const errorHandler = require("./middleware/errorHandler");
 app.use(errorHandler);
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// ✅ FIXED PORT
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
