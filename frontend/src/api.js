@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://campuskey-dxzq.onrender.com/api"
+  baseURL: "https://resolvex-hiyn.onrender.com"
 });
 
 export default API;

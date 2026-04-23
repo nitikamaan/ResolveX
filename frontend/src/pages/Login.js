@@ -1,39 +1,19 @@
 import { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import API from "../api";
+import "../App.css";
 
 export default function Login() {
+  const [data, setData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
-  const [data, setData] = useState({
-    email: "",
-    password: ""
-  });
-
-  const [error, setError] = useState("");
-
-  const submit = async () => {
-    console.log("LOGIN CLICKED", data);
-
+  const handleSubmit = async () => {
     try {
-      if (!data.email || !data.password) {
-        setError("All fields are required");
-        return;
-      }
-
-      const res = await API.post("/login", data);
-
-      // Save token
+      const res = await axios.post("http://localhost:5000/api/login", data);
       localStorage.setItem("token", res.data.token);
-
-      alert("Login successful!");
-
-      // ✅ React navigation (IMPORTANT FIX)
       navigate("/dashboard");
-
-    } catch (err) {
-      console.log("LOGIN ERROR:", err);
-      setError(err.response?.data?.message || "Login failed");
+    } catch {
+      alert("Invalid login");
     }
   };
 
@@ -41,35 +21,10 @@ export default function Login() {
     <div className="container">
       <h2>Login</h2>
 
-      {error && <p className="error">{error}</p>}
+      <input placeholder="Email" onChange={e => setData({...data, email:e.target.value})}/>
+      <input type="password" placeholder="Password" onChange={e => setData({...data, password:e.target.value})}/>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          submit();
-        }}
-      >
-        <input
-          placeholder="Email"
-          value={data.email}
-          onChange={(e) =>
-            setData({ ...data, email: e.target.value })
-          }
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={data.password}
-          onChange={(e) =>
-            setData({ ...data, password: e.target.value })
-          }
-        />
-
-        <button type="submit">
-          Login
-        </button>
-      </form>
+      <button onClick={handleSubmit}>Login</button>
     </div>
   );
 }

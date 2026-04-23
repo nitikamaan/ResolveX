@@ -1,12 +1,19 @@
-const dns = require('dns').promises;
-dns.setServers(['8.8.8.8', '1.1.1.1']);
+// ================= DNS CONFIG =================
+const dns = require("dns").promises;
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
+// ================= IMPORTS =================
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 
+const connectDB = require("./config/db");
+
+// ================= INIT APP =================
 const app = express();
+
+// ================= CONNECT DB =================
+connectDB();
 
 // ================= MIDDLEWARE =================
 app.use(express.json());
@@ -24,22 +31,15 @@ app.get("/", (req, res) => {
 
 // ================= ROUTES =================
 app.use("/api", require("./routes/authRoutes"));
+app.use("/api/grievances", require("./routes/grievanceRoutes"));
 
 // ================= ERROR HANDLER =================
 const errorHandler = require("./middleware/errorHandler");
 app.use(errorHandler);
 
-// ================= SERVER START AFTER DB =================
+// ================= SERVER =================
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected");
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.log("DB Connection Failed ❌", err);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
