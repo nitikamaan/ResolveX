@@ -6,7 +6,9 @@ export default function Home() {
 
   return (
     <div className="container">
-      <h1>Student Grievance System</h1>
+      <h1>ResolveX 🔥</h1>
+      <p>Student Grievance System</p>
+
       <button onClick={() => navigate("/login")}>Login</button>
       <button onClick={() => navigate("/register")}>Register</button>
     </div>

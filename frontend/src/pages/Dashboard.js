@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "../App.css";
 
+const API = "https://resolvex-hiyn.onrender.com";
+
 export default function Dashboard() {
   const [grievances, setGrievances] = useState([]);
   const [form, setForm] = useState({
@@ -15,40 +17,35 @@ export default function Dashboard() {
 
   if (!token) window.location.href = "/login";
 
+  const headers = { Authorization: token };
+
   const fetchData = async () => {
-    const res = await axios.get("http://localhost:5000/api/grievances", {
-      headers: { Authorization: token }
-    });
+    const res = await axios.get(`${API}/api/grievances`, { headers });
     setGrievances(res.data);
   };
 
   const addGrievance = async () => {
-    await axios.post("http://localhost:5000/api/grievances", form, {
-      headers: { Authorization: token }
-    });
+    await axios.post(`${API}/api/grievances`, form, { headers });
     fetchData();
   };
 
   const deleteGrievance = async (id) => {
-    await axios.delete(`http://localhost:5000/api/grievances/${id}`, {
-      headers: { Authorization: token }
-    });
+    await axios.delete(`${API}/api/grievances/${id}`, { headers });
     fetchData();
   };
 
   const updateStatus = async (id) => {
-    await axios.put(
-      `http://localhost:5000/api/grievances/${id}`,
-      { status: "Resolved" },
-      { headers: { Authorization: token } }
-    );
+    await axios.put(`${API}/api/grievances/${id}`, {
+      status: "Resolved"
+    }, { headers });
+
     fetchData();
   };
 
   const searchGrievance = async () => {
     const res = await axios.get(
-      `http://localhost:5000/api/grievances/search?title=${search}`,
-      { headers: { Authorization: token } }
+      `${API}/api/grievances/search?title=${search}`,
+      { headers }
     );
     setGrievances(res.data);
   };
@@ -61,15 +58,31 @@ export default function Dashboard() {
     <div className="container">
       <h2>Dashboard</h2>
 
-      <input placeholder="Search" onChange={e => setSearch(e.target.value)} />
+      <button onClick={() => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      }}>
+        Logout
+      </button>
+
+      <hr />
+
+      <input placeholder="Search"
+        onChange={e => setSearch(e.target.value)}
+      />
       <button onClick={searchGrievance}>Search</button>
 
-      <h3>Add Grievance</h3>
+      <h3>Submit Grievance</h3>
 
-      <input placeholder="Title" onChange={e => setForm({...form, title:e.target.value})}/>
-      <input placeholder="Description" onChange={e => setForm({...form, description:e.target.value})}/>
+      <input placeholder="Title"
+        onChange={e => setForm({ ...form, title: e.target.value })}
+      />
 
-      <select onChange={e => setForm({...form, category:e.target.value})}>
+      <input placeholder="Description"
+        onChange={e => setForm({ ...form, description: e.target.value })}
+      />
+
+      <select onChange={e => setForm({ ...form, category: e.target.value })}>
         <option>Academic</option>
         <option>Hostel</option>
         <option>Transport</option>
@@ -77,6 +90,8 @@ export default function Dashboard() {
       </select>
 
       <button onClick={addGrievance}>Submit</button>
+
+      <h3>All Grievances</h3>
 
       {grievances.map(g => (
         <div className="card" key={g._id}>
@@ -89,13 +104,6 @@ export default function Dashboard() {
           <button onClick={() => deleteGrievance(g._id)}>Delete</button>
         </div>
       ))}
-
-      <button className="logout" onClick={() => {
-        localStorage.removeItem("token");
-        window.location.href = "/";
-      }}>
-        Logout
-      </button>
     </div>
   );
 }
